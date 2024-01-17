@@ -13,7 +13,8 @@ gen_top () {
     gunzip |
     head -n 200000 |
     cut -d, -f2 |
-    sed 's|||' > temp/top.list
+    sed 's|
+||' > temp/top.list
 }
 
 gen_cn () {
@@ -74,7 +75,7 @@ gen_chn () {
 
 git_cp () {
     git pull # in case modified from github web
-    git commit -a -m "$*"
+    git commit -a -m "$*" || true
     git push
 }
 
