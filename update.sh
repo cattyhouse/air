@@ -31,6 +31,9 @@ gen_cn () {
 
     # find top chinese domains in top.list
     grep -Fx -f temp/felix.cn.list temp/top.list > chn.top.list
+
+    # allow customize chn list
+    cat files/custom.chn.list >> chn.top.list
 }
 
 gen_gfw () {
@@ -48,6 +51,9 @@ gen_gfw () {
     sort | uniq  > temp/gfwlist.merge.list
     # find top gfw domains in top.list
     grep -Fx -f temp/gfwlist.merge.list temp/top.list > gfw.top.list
+
+    # allow customize gfw list
+    cat files/custom.gfw.list >> gfw.top.list
 }
 
 gen_chn () {
