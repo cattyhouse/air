@@ -63,7 +63,7 @@ gen_chn () {
     apnic='https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
     ipip='https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt'
     
-    curl -sfl -o temp/apnic -o temp/ipip $apnic $ipip
+    curl -sfL -o temp/apnic -o temp/ipip $apnic $ipip
 
     # chnroute v4
     awk -F'|' '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' temp/apnic > temp/apnic.v4
