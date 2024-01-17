@@ -7,14 +7,14 @@ out () {
 
 gen_top () {
     out "gen top list"
-    # remove microsoft's ^M, input this with ctrl v then ctrl m
+    # remove Microsoft Carriage Return
+    # input this with ctrl v then ctrl m, or use '\r$'
     toplist='https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip'
     curl -sfL $toplist |
     gunzip |
     head -n 200000 |
     cut -d, -f2 |
-    sed 's|
-||' > temp/top.list
+    sed 's|\r$||' > temp/top.list
 }
 
 gen_cn () {
