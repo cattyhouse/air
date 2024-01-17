@@ -35,7 +35,8 @@ gen_cn () {
 
 gen_gfw () {
     out "gen gfw top list"
-    local gfwlist=https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt
+    local gfwlist
+    gfwlist='https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt'
     curl -sfL $gfwlist | base64 -d |
     grep -vE '^\!|\[|^@@|(https?://){0,1}[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' |
     sed -r 's#^(\|\|?)?(https?://)?##g' |
@@ -52,11 +53,10 @@ gen_gfw () {
 gen_chn () {
     out "gen chnroute chnroute6"
     local apnic ipip
-    apnic=https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest
-    ipip=https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt
+    apnic='https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
+    ipip='https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt'
     
-    curl -sfl -o temp/apnic $apnic
-    curl -sfL -o temp/ipip $ipip
+    curl -sfl -o temp/apnic -o temp/ipip $apnic $ipip
 
     # chnroute v4
     awk -F'|' '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' temp/apnic > temp/apnic.v4
@@ -67,12 +67,12 @@ gen_chn () {
 }
 
 git_cp () {
+    git pull # in case modified from github web
     git commit -a -m "$*"
     git push
 }
 
-selfdir=${0%/*}
-cd $selfdir
+cd ${0%/*} # must run with full path
 mkdir -p temp files
 gen_top
 gen_cn
