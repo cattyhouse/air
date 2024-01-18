@@ -1,6 +1,7 @@
 #/bin/bash
+set -x
 set -o errexit
-set -o pipefail
+#set -o pipefail
 
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 
