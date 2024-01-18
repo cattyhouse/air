@@ -86,10 +86,12 @@ git_cp () {
     git push
 }
 
+now=$(date '+%Y-%m-%d %H:%M:%S')
+
 cd ${0%/*} # must run with full path
 mkdir -p temp files
 gen_top
 gen_cn
 gen_gfw
 gen_chn
-git_cp "update"
+git_cp "update : $now"
