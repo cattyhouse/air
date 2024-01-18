@@ -1,6 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 set -o errexit
-set -o pipefail
 
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 
@@ -13,7 +12,8 @@ gen_top () {
     # remove Microsoft Carriage Return
     # input this with ctrl v then ctrl m, or use '\r$'
     toplist='https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip'
-    curl -sfL $toplist |
+    curl -sfL $toplist -o temp/top-1m.csv.zip
+    cat temp/top-1m.csv.zip |
     gunzip |
     cut -d, -f2 |
     sed 's|\r$||' > temp/top.list
@@ -27,8 +27,10 @@ gen_cn () {
     felix_google='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf'
     felix_china='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf'
 
-    curl -sfZL --no-progress-meter $felix_apple $felix_google $felix_china |
-    cut -d '/' -f2 |
+    ( cd temp
+    curl -sfZL --no-progress-meter -OOO $felix_apple $felix_google $felix_china
+    cat apple.china.conf google.china.conf accelerated-domains.china.conf
+    ) | cut -d '/' -f2 |
     grep -v -e '\.cn$' -e '^cn$' -e '^[[:blank:]]*#' -e '^[[:blank:]]*$' |
     sort | uniq > temp/felix.cn.list
 
@@ -46,7 +48,8 @@ gen_gfw () {
     out "gen gfw top list"
     local gfwlist
     gfwlist='https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt'
-    curl -sfL $gfwlist | base64 -d |
+    curl -sfL $gfwlist -o temp/gfwlist.txt
+    cat gfwlist.txt | base64 -d |
     grep -vE '^\!|\[|^@@|(https?://){0,1}[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' |
     sed -r 's#^(\|\|?)?(https?://)?##g' |
     sed -r 's#/.*$|%2F.*$##g' |
