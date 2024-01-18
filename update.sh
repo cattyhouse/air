@@ -23,14 +23,13 @@ gen_top () {
 gen_cn () {
     out "gen chn top list"
     # felixonmars source
-    local felix_apple felix_google felix_china
-    felix_apple='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf'
-    felix_google='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf'
-    felix_china='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf'
+    local url files
+    url='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master'
+    files='apple.china.conf,google.china.conf,accelerated-domains.china.conf'
 
     ( cd temp
-    curl -sfZL --no-progress-meter -OOO $felix_apple $felix_google $felix_china
-    cat apple.china.conf google.china.conf accelerated-domains.china.conf
+    curl -sfZL --no-progress-meter -OOO "$url/{$files}"
+    cat $(echo $files | tr ',' ' ')
     ) | cut -d '/' -f2 |
     grep -v -e '\.cn$' -e '^cn$' -e '^[[:blank:]]*#' -e '^[[:blank:]]*$' |
     sort | uniq > temp/felix.cn.list
