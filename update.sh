@@ -49,7 +49,7 @@ gen_gfw () {
     local gfwlist
     gfwlist='https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt'
     curl -sfL $gfwlist -o temp/gfwlist.txt
-    cat gfwlist.txt | base64 -d |
+    cat temp/gfwlist.txt | base64 -d |
     grep -vE '^\!|\[|^@@|(https?://){0,1}[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' |
     sed -r 's#^(\|\|?)?(https?://)?##g' |
     sed -r 's#/.*$|%2F.*$##g' |
