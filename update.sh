@@ -52,10 +52,10 @@ gen_gfw () {
     curl -sfL $gfwlist -o temp/gfwlist.txt
     cat temp/gfwlist.txt | base64 -d |
     grep -vE '^\!|\[|^@@|(https?://){0,1}[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' |
-    sed -E 's#^(\|\|?)?(https?://)?##g' |
-    sed -E 's#/.*$|%2F.*$##g' |
+    sed -r 's#^(\|\|?)?(https?://)?##g' |
+    sed -r 's#/.*$|%2F.*$##g' |
     grep -E '([a-zA-Z0-9][-a-zA-Z0-9]*(\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)' |
-    sed -E 's#^(([a-zA-Z0-9]*\*[-a-zA-Z0-9]*)?(\.))?([a-zA-Z0-9][-a-zA-Z0-9]*(\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)(\*[a-zA-Z0-9]*)?#\4#g' > temp/gfwlist.list
+    sed -r 's#^(([a-zA-Z0-9]*\*[-a-zA-Z0-9]*)?(\.))?([a-zA-Z0-9][-a-zA-Z0-9]*(\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)(\*[a-zA-Z0-9]*)?#\4#g' > temp/gfwlist.list
 
     grep -v -h -e '\.cn$' -e '^cn$' -e '^[[:blank:]]*#' -e '^[[:blank:]]*$' temp/gfwlist.list files/google.list |
     sort | uniq  > temp/gfwlist.merge.list
