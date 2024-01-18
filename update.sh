@@ -1,5 +1,4 @@
 #!/bin/sh
-set -o errexit
 
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 
@@ -12,9 +11,8 @@ gen_top () {
     # remove Microsoft Carriage Return
     # input this with ctrl v then ctrl m, or use '\r$'
     toplist='https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip'
-    curl -sfL $toplist -o temp/top-1m.csv.zip
-    cat temp/top-1m.csv.zip |
-    gunzip |
+    curl -sfL $toplist -o temp/top-1m.csv.zip || return
+    gunzip < temp/top-1m.csv.zip |
     head -n 400000 |
     cut -d, -f2 |
     sed 's|\r$||' > temp/top.list
@@ -28,7 +26,7 @@ gen_cn () {
     files='apple.china.conf,google.china.conf,accelerated-domains.china.conf'
 
     ( cd temp
-    curl -sfZL --no-progress-meter -OOO "$url/{$files}"
+    curl -sfZL --no-progress-meter -OOO "$url/{$files}" || return
     cat $(echo $files | tr ',' ' ')
     ) | cut -d '/' -f2 |
     grep -v -e '\.cn$' -e '^cn$' -e '^[[:blank:]]*#' -e '^[[:blank:]]*$' |
@@ -48,8 +46,8 @@ gen_gfw () {
     out "gen gfw top list"
     local gfwlist
     gfwlist='https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt'
-    curl -sfL $gfwlist -o temp/gfwlist.txt
-    cat temp/gfwlist.txt | base64 -d |
+    curl -sfL $gfwlist -o temp/gfwlist.txt || return
+    base64 -d < temp/gfwlist.txt |
     grep -vE '^\!|\[|^@@|(https?://){0,1}[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' |
     sed -E 's#^(\|\|?)?(https?://)?##g' |
     sed -E 's#/.*$|%2F.*$##g' |
@@ -75,7 +73,7 @@ gen_chn () {
     apnic='https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
     ipip='https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt'
     
-    curl -sfL -o temp/apnic -o temp/ipip $apnic $ipip
+    curl -sfL -o temp/apnic -o temp/ipip $apnic $ipip || return
 
     # chnroute v4
     awk -F'|' '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' temp/apnic > temp/apnic.v4
@@ -87,7 +85,7 @@ gen_chn () {
 
 git_cp () {
     git pull # in case modified from github web
-    git commit -a -m "$*" || true
+    git commit -a -m "$*"
     git push
 }
 
