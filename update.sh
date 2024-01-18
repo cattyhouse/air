@@ -15,6 +15,7 @@ gen_top () {
     curl -sfL $toplist -o temp/top-1m.csv.zip
     cat temp/top-1m.csv.zip |
     gunzip |
+    head -n 200000 |
     cut -d, -f2 |
     sed 's|\r$||' > temp/top.list
 }
