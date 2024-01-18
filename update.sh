@@ -1,4 +1,7 @@
-#/bin/sh -e
+#!/bin/bash
+set -o errexit
+set -o pipefail
+
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 
 out () {
@@ -12,7 +15,6 @@ gen_top () {
     toplist='https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip'
     curl -sfL $toplist |
     gunzip |
-    head -n 200000 |
     cut -d, -f2 |
     sed 's|\r$||' > temp/top.list
 }
