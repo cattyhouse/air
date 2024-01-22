@@ -77,10 +77,10 @@ gen_chn () {
 
     # chnroute v4
     awk -F'|' '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' temp/apnic > temp/apnic.v4
-    cat temp/ipip temp/apnic.v4 | netaggregate > chnroute
+    ip-dedup -4 -o chnroute temp/ipip temp/apnic.v4
 
     # chnroute v6
-    awk -F'|' '/CN\|ipv6/ { printf("%s/%d\n", $4, $5) }' temp/apnic | netaggregate > chnroute6
+    awk -F'|' '/CN\|ipv6/ { printf("%s/%d\n", $4, $5) }' temp/apnic | ip-dedup -6 -o chnroute6
 }
 
 git_cp () {
