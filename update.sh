@@ -11,7 +11,7 @@ gen_top () {
     # remove Microsoft Carriage Return
     # input this with ctrl v then ctrl m, or use '\r$'
     toplist='https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip'
-    curl -sSfL $toplist -o temp/top-1m.csv.zip 2>> err.log || return
+    curl $curl_opt $toplist -o temp/top-1m.csv.zip 2>> err.log || return
     gunzip < temp/top-1m.csv.zip |
     head -n 400000 |
     cut -d, -f2 |
@@ -26,7 +26,7 @@ gen_cn () {
     files='apple.china.conf,google.china.conf,accelerated-domains.china.conf'
 
     ( cd temp
-    curl -sSfZL --no-progress-meter -OOO "$url/{$files}" 2>> err.log || return
+    curl $curl_opt -Z --no-progress-meter -OOO "$url/{$files}" 2>> err.log || return
     cat $(echo $files | tr ',' ' ')
     ) | cut -d '/' -f2 |
     grep -v -e '\.cn$' -e '^cn$' -e '^[[:blank:]]*#' -e '^[[:blank:]]*$' |
@@ -46,7 +46,7 @@ gen_gfw () {
     out "gen gfw top list"
     local gfwlist
     gfwlist='https://github.com/gfwlist/gfwlist/raw/master/gfwlist.txt'
-    curl -sSfL $gfwlist -o temp/gfwlist.txt 2>> err.log || return
+    curl $curl_opt $gfwlist -o temp/gfwlist.txt 2>> err.log || return
     base64 -d < temp/gfwlist.txt |
     grep -vE '^\!|\[|^@@|(https?://){0,1}[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' |
     sed -E 's#^(\|\|?)?(https?://)?##g' |
@@ -73,7 +73,7 @@ gen_chn () {
     apnic='https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest'
     ipip='https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt'
     
-    curl -sSfL -o temp/apnic -o temp/ipip $apnic $ipip 2>> err.log || return
+    curl $curl_opt -o temp/apnic -o temp/ipip $apnic $ipip 2>> err.log || return
 
     # chnroute v4
     awk -F'|' '/CN\|ipv4/ { printf("%s/%d\n", $4, 32-log($5)/log(2)) }' temp/apnic > temp/apnic.v4
@@ -89,11 +89,12 @@ git_cp () {
     git push
 }
 
-now=$(date '+%Y-%m-%d %H:%M:%S')
+now=$(date '+%F %T')
+curl_opt="--connect-timeout 10 -sSfL"
 
 cd ${0%/*} # must run with full path
 mkdir -p temp files
-date '+%F %T' >> err.log
+out "$now" >> err.log
 gen_top
 gen_cn
 gen_gfw
