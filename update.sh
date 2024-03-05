@@ -33,7 +33,7 @@ gen_cn () {
     sort | uniq > temp/felix.cn.list
 
     # find top chinese domains in top.list
-    grep -Fx -f temp/felix.cn.list temp/top.list > chn.top.list
+    grep -Fx -f temp/felix.cn.list temp/top.list | sort > chn.top.list
 
     # add cn to cnh.top.list
     echo 'cn' >> chn.top.list
@@ -58,7 +58,7 @@ gen_gfw () {
     sort | uniq  > temp/gfwlist.merge.list
 
     # find top gfw domains in top.list
-    grep -Fx -f temp/gfwlist.merge.list temp/top.list > gfw.top.list
+    grep -Fx -f temp/gfwlist.merge.list temp/top.list | sort > gfw.top.list
 
     # add blocked .cn to gfw.top.list
     grep '\.cn$' temp/gfwlist.list | sort | uniq >> gfw.top.list
