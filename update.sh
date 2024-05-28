@@ -89,6 +89,18 @@ git_cp () {
     git push
 }
 
+check_cmd () {
+    local cmd miss=0
+    for cmd in "$@" ; do
+        command -v $cmd > /dev/null || {
+            echo "$cmd not found"
+            miss=1
+        }
+    done
+    if [ $miss = 1 ] ; then exit 1 ; fi
+}
+
+check_cmd curl ip-dedup git awk grep sed gunzip sort uniq base64
 now=$(date '+%F %T')
 curl_opt="--connect-timeout 10 -sSfL"
 
