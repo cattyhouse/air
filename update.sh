@@ -25,10 +25,8 @@ gen_cn () {
     url='https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master'
     files='apple.china.conf,google.china.conf,accelerated-domains.china.conf'
 
-    ( cd temp
-    curl $curl_opt -Z --no-progress-meter -OOO "$url/{$files}" 2>> err.log || return
-    cat $(echo $files | tr ',' ' ')
-    ) | cut -d '/' -f2 |
+    curl $curl_opt --output-dir temp -Z --no-progress-meter -OOO "$url/{$files}" 2>> err.log || return
+    ( cd temp ; cat $(echo $files | tr ',' ' ') ) | cut -d '/' -f2 |
     grep -v -e '\.cn$' -e '^cn$' -e '^[[:blank:]]*#' -e '^[[:blank:]]*$' |
     sort | uniq > temp/felix.cn.list
 
